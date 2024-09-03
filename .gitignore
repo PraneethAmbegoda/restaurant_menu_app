@@ -1,0 +1,34 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, typically created by `cargo test`
+/target/debug/deps/*
+
+# Output of `cargo test`
+/target/debug/test-*
+
+# Rust/Cargo-specific files
+/target/
+**/*.rs.bk
+
+# If you have any Cargo.lock, but you're creating a library, you might want to keep it
+# In most cases, if you're creating a binary, Cargo.lock should be committed
+# If you don't want to commit it, uncomment the following line:
+# /Cargo.lock
+
+
+.vscode/
+*.swp
+*.swo
+*.swn
+
+# MacOS-specific files
+.DS_Store
+
+# Ignore compiled files from Clippy or Rustfmt
+.clippy.toml
+.rustfmt.toml
