@@ -1,0 +1,27 @@
+[package]
+name = "restaurant_menu_app"
+version = "0.1.0"
+edition = "2021"
+
+# Documentation metadata
+description = "A restaurant menu management system using Rust"
+authors = ["Praneeth Ambegoda <praneeth.asanga@gmail.com>"]
+license = "MIT"
+
+# Dependencies
+[dependencies]
+actix-web = "4.9.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+rand = "0.8"
+mockall = "0.10"
+tokio = { version = "1", features = ["full"] }
+
+
+[dev-dependencies]
+actix-rt = "2.5"
+actix-web = "4.9.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+mockall = "0.10"
+tokio = { version = "1", features = ["full"] }
