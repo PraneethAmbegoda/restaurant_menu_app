@@ -1,5 +1,6 @@
 use actix_web::{http::StatusCode, test, web, App};
-use restaurant_menu_app::server::handlers::{configure_routes, AppState};
+use restaurant_menu_app::server::api::v1::handlers::AppState;
+use restaurant_menu_app::server::api::v1::routes::configure_routes;
 use restaurant_menu_app::server::in_memory_menu_store::InMemoryMenuStore;
 use restaurant_menu_app::server::in_memory_order_store::InMemoryOrderStore;
 use restaurant_menu_app::server::in_memory_table_store::InMemoryTableStore;
