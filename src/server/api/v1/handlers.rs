@@ -11,6 +11,18 @@ pub struct AppState {
     pub restaurant: Arc<dyn Restaurant + Send + Sync>,
 }
 
+/// Adds a menu item to the specified table.
+///
+/// # Arguments
+///
+/// * `data` - Application state that contains the restaurant.
+/// * `params` - Path parameters containing the table ID and menu item ID.
+///
+/// # Responses
+///
+/// * `200` - Menu item added successfully.
+/// * `404` - Table or menu item not found.
+/// * `500` - Internal server error.
 #[utoipa::path(
     post,
     path = "/api/v1/add_item/{table_id}/{menu_item_id}",
@@ -32,6 +44,18 @@ pub async fn add_item(data: web::Data<AppState>, params: web::Path<(u32, u32)>) 
     }
 }
 
+/// Removes a menu item from the specified table.
+///
+/// # Arguments
+///
+/// * `data` - Application state that contains the restaurant.
+/// * `params` - Path parameters containing the table ID and menu item ID.
+///
+/// # Responses
+///
+/// * `200` - Menu item removed successfully.
+/// * `404` - Table or menu item not found.
+/// * `500` - Internal server error.
 #[utoipa::path(
     delete,
     path = "/api/v1/remove_item/{table_id}/{menu_item_id}",
@@ -56,6 +80,18 @@ pub async fn remove_item(
     }
 }
 
+/// Retrieves all menu items added to the specified table.
+///
+/// # Arguments
+///
+/// * `data` - Application state that contains the restaurant.
+/// * `table_id` - Path parameter containing the table ID.
+///
+/// # Responses
+///
+/// * `200` - List of menu items added for the table.
+/// * `404` - Table not found.
+/// * `500` - Internal server error.
 #[utoipa::path(
     get,
     path = "/api/v1/get_items/{table_id}",
@@ -76,6 +112,18 @@ pub async fn get_items(data: web::Data<AppState>, table_id: web::Path<u32>) -> i
     }
 }
 
+/// Retrieves details of a specific menu item added to the specified table.
+///
+/// # Arguments
+///
+/// * `data` - Application state that contains the restaurant.
+/// * `params` - Path parameters containing the table ID and menu item ID.
+///
+/// # Responses
+///
+/// * `200` - Menu item details.
+/// * `404` - Table or menu item not found.
+/// * `500` - Internal server error.
 #[utoipa::path(
     get,
     path = "/api/v1/get_item/{table_id}/{menu_item_id}",
@@ -97,6 +145,16 @@ pub async fn get_item(data: web::Data<AppState>, params: web::Path<(u32, u32)>) 
     }
 }
 
+/// Retrieves a list of all available tables in the restaurant.
+///
+/// # Arguments
+///
+/// * `data` - Application state that contains the restaurant.
+///
+/// # Responses
+///
+/// * `200` - List of available tables.
+/// * `500` - Internal server error.
 #[utoipa::path(
     get,
     path = "/api/v1/tables",
@@ -113,6 +171,16 @@ pub async fn get_tables(data: web::Data<AppState>) -> impl Responder {
     }
 }
 
+/// Retrieves a list of all available menu items in the restaurant.
+///
+/// # Arguments
+///
+/// * `data` - Application state that contains the restaurant.
+///
+/// # Responses
+///
+/// * `200` - List of available menus.
+/// * `500` - Internal server error.
 #[utoipa::path(
     get,
     path = "/api/v1/menus",
