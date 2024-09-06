@@ -4,9 +4,10 @@
 use crate::server::error::RestaurantError;
 use mockall::automock;
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
 /// Represents a menu item in the restaurant.
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, ToSchema)]
 pub struct MenuItem {
     pub id: u32,
     pub name: String,

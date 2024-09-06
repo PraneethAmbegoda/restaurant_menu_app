@@ -16,6 +16,8 @@ serde_json = "1.0"
 rand = "0.8"
 mockall = "0.10"
 tokio = { version = "1", features = ["full"] }
+utoipa = "3"
+utoipa-swagger-ui = { version = "3", features = ["actix-web"] }
 
 
 [dev-dependencies]
@@ -25,3 +27,5 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 mockall = "0.10"
 tokio = { version = "1", features = ["full"] }
+utoipa = "3"
+utoipa-swagger-ui = { version = "3", features = ["actix-web"] }

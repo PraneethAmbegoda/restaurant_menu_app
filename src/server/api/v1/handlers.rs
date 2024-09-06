@@ -2,7 +2,7 @@
 #![deny(clippy::all)]
 
 use crate::server::error::RestaurantError;
-use crate::server::models::{MenuItem, Restaurant};
+use crate::server::models::Restaurant;
 use actix_web::{web, HttpResponse, Responder};
 use std::sync::Arc;
 
@@ -11,19 +11,40 @@ pub struct AppState {
     pub restaurant: Arc<dyn Restaurant + Send + Sync>,
 }
 
-// Handlers
-pub async fn add_item(
-    data: web::Data<AppState>,
-    table_id: web::Path<u32>,
-    item: web::Json<MenuItem>,
-) -> impl Responder {
+#[utoipa::path(
+    post,
+    path = "/api/v1/add_item/{table_id}/{menu_item_id}",
+    responses(
+        (status = 200, description = "Menu ttem added successfully"),
+        (status = 404, description = "Table or menu item not found"),
+        (status = 500, description = "Internal server error")
+    ),
+    params(
+        ("table_id" = u32, description = "ID of the table"),
+        ("menu_item_id" = u32, description = "ID of the Menu"),
+    ),
+)]
+pub async fn add_item(data: web::Data<AppState>, params: web::Path<(u32, u32)>) -> impl Responder {
     let restaurant = &data.restaurant;
-    match restaurant.add_item(*table_id, item.id) {
+    match restaurant.add_item(params.0, params.1) {
         Ok(_) => HttpResponse::Ok().json("Item added successfully"),
         Err(e) => restaurant_error_to_response(e),
     }
 }
 
+#[utoipa::path(
+    delete,
+    path = "/api/v1/remove_item/{table_id}/{menu_item_id}",
+    responses(
+        (status = 200, description = "Menu Item removed successfully"),
+        (status = 404, description = "Table or menu item not found"),
+        (status = 500, description = "Internal server error")
+    ),
+    params(
+        ("table_id" = u32, description = "ID of the table"),
+        ("menu_item_id" = u32, description = "ID of the menu item to remove")
+    )
+)]
 pub async fn remove_item(
     data: web::Data<AppState>,
     params: web::Path<(u32, u32)>,
@@ -35,6 +56,18 @@ pub async fn remove_item(
     }
 }
 
+#[utoipa::path(
+    get,
+    path = "/api/v1/get_items/{table_id}",
+    responses(
+        (status = 200, description = "List of menuitems added for the table", body = [MenuItem]),
+        (status = 404, description = "Table not found"),
+        (status = 500, description = "Internal server error")
+    ),
+    params(
+        ("table_id" = u32, description = "ID of the table")
+    )
+)]
 pub async fn get_items(data: web::Data<AppState>, table_id: web::Path<u32>) -> impl Responder {
     let restaurant = &data.restaurant;
     match restaurant.get_items(*table_id) {
@@ -43,6 +76,19 @@ pub async fn get_items(data: web::Data<AppState>, table_id: web::Path<u32>) -> i
     }
 }
 
+#[utoipa::path(
+    get,
+    path = "/api/v1/get_item/{table_id}/{menu_item_id}",
+    responses(
+        (status = 200, description = "Menu item details", body = MenuItem),
+        (status = 404, description = "Table or menu item not found"),
+        (status = 500, description = "Internal server error")
+    ),
+    params(
+        ("table_id" = u32, description = "ID of the table"),
+        ("menu_item_id" = u32, description = "ID of the menu item")
+    )
+)]
 pub async fn get_item(data: web::Data<AppState>, params: web::Path<(u32, u32)>) -> impl Responder {
     let restaurant = &data.restaurant;
     match restaurant.get_item(params.0, params.1) {
@@ -51,6 +97,14 @@ pub async fn get_item(data: web::Data<AppState>, params: web::Path<(u32, u32)>) 
     }
 }
 
+#[utoipa::path(
+    get,
+    path = "/api/v1/tables",
+    responses(
+        (status = 200, description = "List of available tables", body = [u32]),
+        (status = 500, description = "Internal server error")
+    )
+)]
 pub async fn get_tables(data: web::Data<AppState>) -> impl Responder {
     let restaurant = &data.restaurant;
     match restaurant.get_all_tables() {
@@ -59,6 +113,14 @@ pub async fn get_tables(data: web::Data<AppState>) -> impl Responder {
     }
 }
 
+#[utoipa::path(
+    get,
+    path = "/api/v1/menus",
+    responses(
+        (status = 200, description = "List of available menus", body = [MenuItem]),
+        (status = 500, description = "Internal server error")
+    )
+)]
 pub async fn get_menus(data: web::Data<AppState>) -> impl Responder {
     let restaurant = &data.restaurant;
     match restaurant.get_all_menus() {
@@ -127,15 +189,8 @@ mod tests {
         )
         .await;
 
-        let item = MenuItem {
-            id: 1,
-            name: "Burger".to_string(),
-            cooking_time: 10,
-        };
-
         let req = test::TestRequest::post()
-            .uri("/api/v1/add_item/1")
-            .set_json(&item)
+            .uri("/api/v1/add_item/1/1")
             .to_request();
         let resp = test::call_service(&mut app, req).await;
 
@@ -177,15 +232,51 @@ mod tests {
         )
         .await;
 
-        let item = MenuItem {
-            id: 1,
-            name: "Burger".to_string(),
-            cooking_time: 10,
-        };
+        let req = test::TestRequest::post()
+            .uri("/api/v1/add_item/1/1")
+            .to_request();
+        let resp = test::call_service(&mut app, req).await;
+
+        assert_eq!(resp.status(), StatusCode::NOT_FOUND);
+    }
+
+    #[actix_rt::test]
+    async fn test_add_item_menu_item_not_found() {
+        let mut mock_table_store = MockTableStore::new();
+        let mut mock_menu_store = MockMenuStore::new();
+        let mut mock_order_store = MockOrderStore::new();
+
+        mock_table_store
+            .expect_get_all_tables()
+            .returning(|| Ok(vec![1, 2, 3])); // Table 1 doesn't exist
+
+        mock_menu_store.expect_get_all_menus().returning(|| {
+            Ok(vec![MenuItem {
+                id: 10,
+                name: "Burger".to_string(),
+                cooking_time: 10,
+            }])
+        });
+
+        // Default expectation for add_item (won't be called)
+        mock_order_store.expect_add_item().returning(|_, _| Ok(()));
+
+        let restaurant = Arc::new(SimpleRestaurant {
+            table_store: Box::new(mock_table_store),
+            order_store: Box::new(mock_order_store),
+            menu_store: Box::new(mock_menu_store),
+        });
+
+        let app_state = AppState { restaurant };
+        let mut app = test::init_service(
+            App::new()
+                .app_data(web::Data::new(app_state))
+                .configure(configure_routes),
+        )
+        .await;
 
         let req = test::TestRequest::post()
-            .uri("/api/v1/add_item/1")
-            .set_json(&item)
+            .uri("/api/v1/add_item/1/1")
             .to_request();
         let resp = test::call_service(&mut app, req).await;
 

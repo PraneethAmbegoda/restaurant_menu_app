@@ -35,15 +35,8 @@ async fn test_add_item() {
     )
     .await;
 
-    let item = MenuItem {
-        id: 1,
-        name: "Burger".to_string(),
-        cooking_time: 10,
-    };
-
     let req = test::TestRequest::post()
-        .uri("/api/v1/add_item/1")
-        .set_json(&item)
+        .uri("/api/v1/add_item/1/1")
         .to_request();
     let resp = test::call_service(&mut app, req).await;
 
@@ -75,15 +68,8 @@ async fn test_add_item_to_nonexistent_table() {
     )
     .await;
 
-    let item = MenuItem {
-        id: 1,
-        name: "Burger".to_string(),
-        cooking_time: 10,
-    };
-
     let req = test::TestRequest::post()
-        .uri("/api/v1/add_item/999") // Nonexistent table ID
-        .set_json(&item)
+        .uri("/api/v1/add_item/999/1") // Nonexistent table ID
         .to_request();
     let resp = test::call_service(&mut app, req).await;
 

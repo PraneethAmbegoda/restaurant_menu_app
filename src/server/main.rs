@@ -3,13 +3,13 @@ use crate::server::api::v1::handlers;
 use crate::server::in_memory_menu_store::InMemoryMenuStore;
 use crate::server::in_memory_order_store::InMemoryOrderStore;
 use crate::server::in_memory_table_store::InMemoryTableStore;
+use crate::server::main::v1::openapi;
 use crate::server::models::Restaurant;
 use crate::server::restaurant::SimpleRestaurant;
 use actix_web::{web, App, HttpServer};
 use std::sync::Arc;
 
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
+pub async fn main() -> std::io::Result<()> {
     // Create the restaurant instance using the SimpleRestaurant implementation
     let restaurant = Arc::new(SimpleRestaurant::new(
         Box::new(InMemoryMenuStore::default()),  // Using Default trait
@@ -27,8 +27,9 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(web::Data::new(app_state.clone())) // Share the state with the handlers
             .configure(v1::routes::configure_routes) // Register routes
+            .service(openapi::configure_openapi_ui()) // Serve OpenAPI docs via Swagger UI
     })
-    .bind("127.0.0.1:8080")?
+    .bind("127.0.0.1:8081")?
     .run()
     .await
 }
