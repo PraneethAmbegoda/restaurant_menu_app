@@ -22,6 +22,7 @@ pub struct AppState {
 ///
 /// * `200` - Menu item added successfully.
 /// * `404` - Table or menu item not found.
+/// * `400` - Bad request.
 /// * `500` - Internal server error.
 #[utoipa::path(
     post,
@@ -29,6 +30,7 @@ pub struct AppState {
     responses(
         (status = 200, description = "Menu ttem added successfully"),
         (status = 404, description = "Table or menu item not found"),
+        (status = 400, description = "Bad request"),
         (status = 500, description = "Internal server error")
     ),
     params(
@@ -36,9 +38,21 @@ pub struct AppState {
         ("menu_item_id" = u32, description = "ID of the Menu"),
     ),
 )]
-pub async fn add_item(data: web::Data<AppState>, params: web::Path<(u32, u32)>) -> impl Responder {
+pub async fn add_item(
+    data: web::Data<AppState>,
+    params: web::Path<(String, String)>,
+) -> impl Responder {
     let restaurant = &data.restaurant;
-    match restaurant.add_item(params.0, params.1) {
+    let table_id = match parse_path_param(&params.0, "table ID") {
+        Ok(id) => id,
+        Err(e) => return e, // Return the error response if validation fails
+    };
+
+    let item_id = match parse_path_param(&params.1, "item ID") {
+        Ok(id) => id,
+        Err(e) => return e, // Return the error response if validation fails
+    };
+    match restaurant.add_item(table_id, item_id) {
         Ok(_) => HttpResponse::Ok().json("Item added successfully"),
         Err(e) => restaurant_error_to_response(e),
     }
@@ -55,6 +69,7 @@ pub async fn add_item(data: web::Data<AppState>, params: web::Path<(u32, u32)>) 
 ///
 /// * `200` - Menu item removed successfully.
 /// * `404` - Table or menu item not found.
+/// * `400` - Bad request.
 /// * `500` - Internal server error.
 #[utoipa::path(
     delete,
@@ -62,6 +77,7 @@ pub async fn add_item(data: web::Data<AppState>, params: web::Path<(u32, u32)>) 
     responses(
         (status = 200, description = "Menu Item removed successfully"),
         (status = 404, description = "Table or menu item not found"),
+        (status = 400, description = "Bad request"),
         (status = 500, description = "Internal server error")
     ),
     params(
@@ -71,10 +87,19 @@ pub async fn add_item(data: web::Data<AppState>, params: web::Path<(u32, u32)>) 
 )]
 pub async fn remove_item(
     data: web::Data<AppState>,
-    params: web::Path<(u32, u32)>,
+    params: web::Path<(String, String)>,
 ) -> impl Responder {
+    let table_id = match parse_path_param(&params.0, "table ID") {
+        Ok(id) => id,
+        Err(e) => return e, // Return the error response if validation fails
+    };
+
+    let item_id = match parse_path_param(&params.1, "item ID") {
+        Ok(id) => id,
+        Err(e) => return e, // Return the error response if validation fails
+    };
     let restaurant = &data.restaurant;
-    match restaurant.remove_item(params.0, params.1) {
+    match restaurant.remove_item(table_id, item_id) {
         Ok(_) => HttpResponse::Ok().json("Item removed successfully"),
         Err(e) => restaurant_error_to_response(e),
     }
@@ -91,6 +116,7 @@ pub async fn remove_item(
 ///
 /// * `200` - List of menu items added for the table.
 /// * `404` - Table not found or no menu items added to the table.
+/// * `400` - Bad request.
 /// * `500` - Internal server error.
 #[utoipa::path(
     get,
@@ -98,15 +124,20 @@ pub async fn remove_item(
     responses(
         (status = 200, description = "List of menuitems added for the table", body = [MenuItem]),
         (status = 404, description = "Table not found or no menu items added to the table"),
+        (status = 400, description = "Bad request"),
         (status = 500, description = "Internal server error")
     ),
     params(
         ("table_id" = u32, description = "ID of the table")
     )
 )]
-pub async fn get_items(data: web::Data<AppState>, table_id: web::Path<u32>) -> impl Responder {
+pub async fn get_items(data: web::Data<AppState>, table_id: web::Path<String>) -> impl Responder {
     let restaurant = &data.restaurant;
-    match restaurant.get_items(*table_id) {
+    let table_id = match parse_path_param(&table_id, "table ID") {
+        Ok(id) => id,
+        Err(e) => return e, // Return the error response if validation fails
+    };
+    match restaurant.get_items(table_id) {
         Ok(items) => HttpResponse::Ok().json(items),
         Err(e) => restaurant_error_to_response(e),
     }
@@ -123,6 +154,7 @@ pub async fn get_items(data: web::Data<AppState>, table_id: web::Path<u32>) -> i
 ///
 /// * `200` - Menu item details.
 /// * `404` - Table or menu item not found or the menu item not added to the table.
+/// * `400` - Bad Request.
 /// * `500` - Internal server error.
 #[utoipa::path(
     get,
@@ -130,6 +162,7 @@ pub async fn get_items(data: web::Data<AppState>, table_id: web::Path<u32>) -> i
     responses(
         (status = 200, description = "Menu item details", body = MenuItem),
         (status = 404, description = "Table or menu item not found or menu item not added to the table"),
+        (status = 400, description = "Bad request"),
         (status = 500, description = "Internal server error")
     ),
     params(
@@ -137,9 +170,21 @@ pub async fn get_items(data: web::Data<AppState>, table_id: web::Path<u32>) -> i
         ("menu_item_id" = u32, description = "ID of the menu item")
     )
 )]
-pub async fn get_item(data: web::Data<AppState>, params: web::Path<(u32, u32)>) -> impl Responder {
+pub async fn get_item(
+    data: web::Data<AppState>,
+    params: web::Path<(String, String)>,
+) -> impl Responder {
     let restaurant = &data.restaurant;
-    match restaurant.get_item(params.0, params.1) {
+    let table_id = match parse_path_param(&params.0, "table ID") {
+        Ok(id) => id,
+        Err(e) => return e, // Return the error response if validation fails
+    };
+
+    let item_id = match parse_path_param(&params.1, "item ID") {
+        Ok(id) => id,
+        Err(e) => return e, // Return the error response if validation fails
+    };
+    match restaurant.get_item(table_id, item_id) {
         Ok(item) => HttpResponse::Ok().json(item),
         Err(e) => restaurant_error_to_response(e),
     }
@@ -194,6 +239,14 @@ pub async fn get_menus(data: web::Data<AppState>) -> impl Responder {
     match restaurant.get_all_menus() {
         Ok(menus) => HttpResponse::Ok().json(menus),
         Err(e) => restaurant_error_to_response(e),
+    }
+}
+
+fn parse_path_param(param: &str, param_name: &str) -> Result<u32, HttpResponse> {
+    match param.parse::<u32>() {
+        Ok(id) => Ok(id),
+        Err(_) => Err(HttpResponse::BadRequest()
+            .json(format!("Invalid {}. Must be a valid integer.", param_name))),
     }
 }
 
@@ -632,5 +685,257 @@ mod tests {
         let resp = test::call_service(&mut app, req).await;
 
         assert_eq!(resp.status(), StatusCode::NOT_FOUND);
+    }
+
+    #[actix_rt::test]
+    async fn test_add_item_invalid_table_id() {
+        let mut mock_table_store = MockTableStore::new();
+        let mock_order_store = MockOrderStore::new();
+        let mut mock_menu_store = MockMenuStore::new();
+
+        // Setting up expectations for valid tables and menus (won't be used in this case)
+        mock_table_store
+            .expect_get_all_tables()
+            .returning(|| Ok(vec![1, 2, 3]));
+
+        mock_menu_store.expect_get_all_menus().returning(|| {
+            Ok(vec![MenuItem {
+                id: 1,
+                name: "Burger".to_string(),
+                cooking_time: 10,
+            }])
+        });
+
+        let restaurant = Arc::new(SimpleRestaurant {
+            table_store: Box::new(mock_table_store),
+            order_store: Box::new(mock_order_store),
+            menu_store: Box::new(mock_menu_store),
+        });
+
+        let app_state = AppState { restaurant };
+        let mut app = test::init_service(
+            App::new()
+                .app_data(web::Data::new(app_state))
+                .configure(configure_routes),
+        )
+        .await;
+
+        // Invalid table ID
+        let req = test::TestRequest::post()
+            .uri("/api/v1/add_item/invalid/1")
+            .to_request();
+        let resp = test::call_service(&mut app, req).await;
+
+        assert_eq!(resp.status(), StatusCode::BAD_REQUEST);
+    }
+
+    #[actix_rt::test]
+    async fn test_add_item_invalid_item_id() {
+        let mut mock_table_store = MockTableStore::new();
+        let mock_order_store = MockOrderStore::new();
+        let mut mock_menu_store = MockMenuStore::new();
+
+        // Setting up expectations for valid tables and menus
+        mock_table_store
+            .expect_get_all_tables()
+            .returning(|| Ok(vec![1, 2, 3]));
+
+        mock_menu_store.expect_get_all_menus().returning(|| {
+            Ok(vec![MenuItem {
+                id: 1,
+                name: "Burger".to_string(),
+                cooking_time: 10,
+            }])
+        });
+
+        let restaurant = Arc::new(SimpleRestaurant {
+            table_store: Box::new(mock_table_store),
+            order_store: Box::new(mock_order_store),
+            menu_store: Box::new(mock_menu_store),
+        });
+
+        let app_state = AppState { restaurant };
+        let mut app = test::init_service(
+            App::new()
+                .app_data(web::Data::new(app_state))
+                .configure(configure_routes),
+        )
+        .await;
+
+        // Invalid item ID
+        let req = test::TestRequest::post()
+            .uri("/api/v1/add_item/1/invalid")
+            .to_request();
+        let resp = test::call_service(&mut app, req).await;
+
+        assert_eq!(resp.status(), StatusCode::BAD_REQUEST);
+    }
+
+    #[actix_rt::test]
+    async fn test_remove_item_invalid_table_id() {
+        let mut mock_table_store = MockTableStore::new();
+        let mock_order_store = MockOrderStore::new();
+
+        // Setting up expectations for valid tables
+        mock_table_store
+            .expect_get_all_tables()
+            .returning(|| Ok(vec![1, 2, 3]));
+
+        let restaurant = Arc::new(SimpleRestaurant {
+            table_store: Box::new(mock_table_store),
+            order_store: Box::new(mock_order_store),
+            menu_store: Box::new(MockMenuStore::new()),
+        });
+
+        let app_state = AppState { restaurant };
+        let mut app = test::init_service(
+            App::new()
+                .app_data(web::Data::new(app_state))
+                .configure(configure_routes),
+        )
+        .await;
+
+        // Invalid table ID
+        let req = test::TestRequest::delete()
+            .uri("/api/v1/remove_item/invalid/1")
+            .to_request();
+        let resp = test::call_service(&mut app, req).await;
+
+        assert_eq!(resp.status(), StatusCode::BAD_REQUEST);
+    }
+
+    #[actix_rt::test]
+    async fn test_remove_item_invalid_item_id() {
+        let mut mock_table_store = MockTableStore::new();
+        let mock_order_store = MockOrderStore::new();
+
+        // Setting up expectations for valid tables
+        mock_table_store
+            .expect_get_all_tables()
+            .returning(|| Ok(vec![1, 2, 3]));
+
+        let restaurant = Arc::new(SimpleRestaurant {
+            table_store: Box::new(mock_table_store),
+            order_store: Box::new(mock_order_store),
+            menu_store: Box::new(MockMenuStore::new()),
+        });
+
+        let app_state = AppState { restaurant };
+        let mut app = test::init_service(
+            App::new()
+                .app_data(web::Data::new(app_state))
+                .configure(configure_routes),
+        )
+        .await;
+
+        // Invalid item ID
+        let req = test::TestRequest::delete()
+            .uri("/api/v1/remove_item/1/invalid")
+            .to_request();
+        let resp = test::call_service(&mut app, req).await;
+
+        assert_eq!(resp.status(), StatusCode::BAD_REQUEST);
+    }
+
+    #[actix_rt::test]
+    async fn test_get_items_invalid_table_id() {
+        let mut mock_table_store = MockTableStore::new();
+        let mock_order_store = MockOrderStore::new();
+        let mock_menu_store = MockMenuStore::new();
+
+        // Setting up expectations for valid tables (won't be used in this case)
+        mock_table_store
+            .expect_get_all_tables()
+            .returning(|| Ok(vec![1, 2, 3]));
+
+        let restaurant = Arc::new(SimpleRestaurant {
+            table_store: Box::new(mock_table_store),
+            order_store: Box::new(mock_order_store),
+            menu_store: Box::new(mock_menu_store),
+        });
+
+        let app_state = AppState { restaurant };
+        let mut app = test::init_service(
+            App::new()
+                .app_data(web::Data::new(app_state))
+                .configure(configure_routes),
+        )
+        .await;
+
+        // Invalid table ID
+        let req = test::TestRequest::get()
+            .uri("/api/v1/get_items/invalid")
+            .to_request();
+        let resp = test::call_service(&mut app, req).await;
+
+        assert_eq!(resp.status(), StatusCode::BAD_REQUEST);
+    }
+
+    #[actix_rt::test]
+    async fn test_get_item_invalid_table_id() {
+        let mut mock_table_store = MockTableStore::new();
+        let mock_order_store = MockOrderStore::new();
+        let mock_menu_store = MockMenuStore::new();
+
+        // Setting up expectations for valid tables (won't be used in this case)
+        mock_table_store
+            .expect_get_all_tables()
+            .returning(|| Ok(vec![1, 2, 3]));
+
+        let restaurant = Arc::new(SimpleRestaurant {
+            table_store: Box::new(mock_table_store),
+            order_store: Box::new(mock_order_store),
+            menu_store: Box::new(mock_menu_store),
+        });
+
+        let app_state = AppState { restaurant };
+        let mut app = test::init_service(
+            App::new()
+                .app_data(web::Data::new(app_state))
+                .configure(configure_routes),
+        )
+        .await;
+
+        // Invalid table ID
+        let req = test::TestRequest::get()
+            .uri("/api/v1/get_item/invalid/1")
+            .to_request();
+        let resp = test::call_service(&mut app, req).await;
+
+        assert_eq!(resp.status(), StatusCode::BAD_REQUEST);
+    }
+
+    #[actix_rt::test]
+    async fn test_get_item_invalid_item_id() {
+        let mut mock_table_store = MockTableStore::new();
+        let mock_order_store = MockOrderStore::new();
+        let mock_menu_store = MockMenuStore::new();
+
+        // Setting up expectations for valid tables and items (won't be used in this case)
+        mock_table_store
+            .expect_get_all_tables()
+            .returning(|| Ok(vec![1, 2, 3]));
+
+        let restaurant = Arc::new(SimpleRestaurant {
+            table_store: Box::new(mock_table_store),
+            order_store: Box::new(mock_order_store),
+            menu_store: Box::new(mock_menu_store),
+        });
+
+        let app_state = AppState { restaurant };
+        let mut app = test::init_service(
+            App::new()
+                .app_data(web::Data::new(app_state))
+                .configure(configure_routes),
+        )
+        .await;
+
+        // Invalid item ID
+        let req = test::TestRequest::get()
+            .uri("/api/v1/get_item/1/invalid")
+            .to_request();
+        let resp = test::call_service(&mut app, req).await;
+
+        assert_eq!(resp.status(), StatusCode::BAD_REQUEST);
     }
 }
