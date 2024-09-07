@@ -77,10 +77,10 @@ impl OrderStore for InMemoryOrderStore {
                 items.remove(pos);
                 Ok(())
             } else {
-                Err(RestaurantError::MenuNotFound(item_id))
+                Err(RestaurantError::NoMenuForTable(table_id, item_id))
             }
         } else {
-            Err(RestaurantError::TableNotFound(table_id))
+            Err(RestaurantError::NoMenusForTable(table_id))
         }
     }
 
@@ -102,7 +102,7 @@ impl OrderStore for InMemoryOrderStore {
         orders
             .get(&table_id)
             .cloned()
-            .ok_or(RestaurantError::TableNotFound(table_id))
+            .ok_or(RestaurantError::NoMenusForTable(table_id))
     }
 
     /// Retrieves a specific item ID from the specified table's order.
@@ -130,7 +130,7 @@ impl OrderStore for InMemoryOrderStore {
                     None
                 }
             })
-            .ok_or(RestaurantError::MenuNotFound(item_id))
+            .ok_or(RestaurantError::NoMenuForTable(table_id, item_id))
     }
 }
 
@@ -172,14 +172,17 @@ mod tests {
 
         store.add_item(table_id, item_id).unwrap();
         let result = store.remove_item(table_id, 99);
-        assert!(matches!(result, Err(RestaurantError::MenuNotFound(99))));
+        assert!(matches!(
+            result,
+            Err(RestaurantError::NoMenuForTable(1, 99))
+        ));
     }
 
     #[test]
     fn test_remove_item_table_not_found() {
         let store = InMemoryOrderStore::new();
         let result = store.remove_item(99, 1);
-        assert!(matches!(result, Err(RestaurantError::TableNotFound(99))));
+        assert!(matches!(result, Err(RestaurantError::NoMenusForTable(99))));
     }
 
     #[test]
@@ -200,7 +203,7 @@ mod tests {
     fn test_get_item_ids_table_not_found() {
         let store = InMemoryOrderStore::new();
         let result = store.get_item_ids(99);
-        assert!(matches!(result, Err(RestaurantError::TableNotFound(99))));
+        assert!(matches!(result, Err(RestaurantError::NoMenusForTable(99))));
     }
 
     #[test]
@@ -220,6 +223,9 @@ mod tests {
         let table_id = 1;
 
         let result = store.get_item_id(table_id, 99);
-        assert!(matches!(result, Err(RestaurantError::MenuNotFound(99))));
+        assert!(matches!(
+            result,
+            Err(RestaurantError::NoMenuForTable(1, 99))
+        ));
     }
 }

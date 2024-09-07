@@ -90,14 +90,14 @@ pub async fn remove_item(
 /// # Responses
 ///
 /// * `200` - List of menu items added for the table.
-/// * `404` - Table not found.
+/// * `404` - Table not found or no menu items added to the table.
 /// * `500` - Internal server error.
 #[utoipa::path(
     get,
     path = "/api/v1/get_items/{table_id}",
     responses(
         (status = 200, description = "List of menuitems added for the table", body = [MenuItem]),
-        (status = 404, description = "Table not found"),
+        (status = 404, description = "Table not found or no menu items added to the table"),
         (status = 500, description = "Internal server error")
     ),
     params(
@@ -122,14 +122,14 @@ pub async fn get_items(data: web::Data<AppState>, table_id: web::Path<u32>) -> i
 /// # Responses
 ///
 /// * `200` - Menu item details.
-/// * `404` - Table or menu item not found.
+/// * `404` - Table or menu item not found or the menu item not added to the table.
 /// * `500` - Internal server error.
 #[utoipa::path(
     get,
     path = "/api/v1/get_item/{table_id}/{menu_item_id}",
     responses(
         (status = 200, description = "Menu item details", body = MenuItem),
-        (status = 404, description = "Table or menu item not found"),
+        (status = 404, description = "Table or menu item not found or menu item not added to the table"),
         (status = 500, description = "Internal server error")
     ),
     params(
@@ -200,14 +200,28 @@ pub async fn get_menus(data: web::Data<AppState>) -> impl Responder {
 fn restaurant_error_to_response(err: RestaurantError) -> HttpResponse {
     match err {
         RestaurantError::LockError(_) => HttpResponse::InternalServerError().json("Internal error"),
-        RestaurantError::TableNotFound(_) => HttpResponse::NotFound().json("Table not found"),
-        RestaurantError::MenuNotFound(_) => HttpResponse::NotFound().json("Menu item not found"),
+        RestaurantError::TableNotFound(table_id) => {
+            HttpResponse::NotFound().json(format!("Table not found for table id:{}", table_id,))
+        }
+        RestaurantError::MenuNotFound(menu_id) => {
+            HttpResponse::NotFound().json(format!("Menu item not found for menu id: {}", menu_id))
+        }
         RestaurantError::MenusRetrieveError => {
             HttpResponse::InternalServerError().json("Error retrieving menus")
         }
         RestaurantError::TablesRetrieveError => {
             HttpResponse::InternalServerError().json("Error retrieving tables")
         }
+        RestaurantError::NoMenuForTable(table_id, menu_item_id) => {
+            HttpResponse::NotFound().json(format!(
+                "No Menu item with menu item id:{}, is found for Table with table id:{}",
+                menu_item_id, table_id
+            ))
+        }
+        RestaurantError::NoMenusForTable(table_id) => HttpResponse::NotFound().json(format!(
+            "No Menu items added for table with table id:{}",
+            table_id
+        )),
     }
 }
 
