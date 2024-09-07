@@ -1,10 +1,10 @@
 use crate::server::api::v1;
 use crate::server::api::v1::handlers;
-use crate::server::in_memory_menu_store::InMemoryMenuStore;
-use crate::server::in_memory_order_store::InMemoryOrderStore;
-use crate::server::in_memory_table_store::InMemoryTableStore;
+use crate::server::data_model::models::Restaurant;
+use crate::server::data_store::in_memory_menu_store::InMemoryMenuStore;
+use crate::server::data_store::in_memory_order_store::InMemoryOrderStore;
+use crate::server::data_store::in_memory_table_store::InMemoryTableStore;
 use crate::server::main::v1::openapi;
-use crate::server::models::Restaurant;
 use crate::server::restaurant::SimpleRestaurant;
 use actix_web::{web, App, HttpServer};
 use std::sync::Arc;

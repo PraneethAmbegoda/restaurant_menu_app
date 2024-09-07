@@ -1,8 +1,8 @@
 #![deny(warnings)]
 #![deny(clippy::all)]
 
-use crate::server::error::RestaurantError;
-use crate::server::models::{MenuItem, MenuStore};
+use crate::server::data_model::models::{MenuItem, MenuStore};
+use crate::server::utils::error::RestaurantError;
 use std::sync::{Arc, Mutex};
 
 /// In-memory implementation of the `MenuStore` trait.
@@ -166,7 +166,7 @@ impl MenuStore for InMemoryMenuStore {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::server::models::MenuItem;
+    use crate::server::data_model::models::MenuItem;
 
     #[test]
     fn test_get_all_menus_success() {

@@ -1,5 +1,5 @@
 use crate::server::api::v1;
-use crate::server::models;
+use crate::server::data_model::models;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 

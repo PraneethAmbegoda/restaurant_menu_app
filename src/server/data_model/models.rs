@@ -1,7 +1,7 @@
 #![deny(warnings)]
 #![deny(clippy::all)]
 
-use crate::server::error::RestaurantError;
+use crate::server::utils::error::RestaurantError;
 use mockall::automock;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;

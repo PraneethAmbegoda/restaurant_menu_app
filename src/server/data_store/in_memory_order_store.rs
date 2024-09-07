@@ -1,8 +1,8 @@
 #![deny(warnings)]
 #![deny(clippy::all)]
 
-use crate::server::error::RestaurantError;
-use crate::server::models::OrderStore;
+use crate::server::data_model::models::OrderStore;
+use crate::server::utils::error::RestaurantError;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 

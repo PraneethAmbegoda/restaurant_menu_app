@@ -1,8 +1,8 @@
 #![deny(warnings)]
 #![deny(clippy::all)]
 
-use crate::server::error::RestaurantError;
-use crate::server::models::Restaurant;
+use crate::server::data_model::models::Restaurant;
+use crate::server::utils::error::RestaurantError;
 use actix_web::{web, HttpResponse, Responder};
 use std::sync::Arc;
 
@@ -282,7 +282,9 @@ fn restaurant_error_to_response(err: RestaurantError) -> HttpResponse {
 mod tests {
     use super::*;
     use crate::server::api::v1::routes::configure_routes;
-    use crate::server::models::{MenuItem, MockMenuStore, MockOrderStore, MockTableStore};
+    use crate::server::data_model::models::{
+        MenuItem, MockMenuStore, MockOrderStore, MockTableStore,
+    };
     use crate::server::restaurant::SimpleRestaurant;
     use actix_web::{http::StatusCode, test, web, App};
     use mockall::predicate::*;

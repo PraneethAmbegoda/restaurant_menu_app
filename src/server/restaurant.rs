@@ -1,8 +1,8 @@
 #![deny(warnings)]
 #![deny(clippy::all)]
 
-use crate::server::error::RestaurantError;
-use crate::server::models::{MenuItem, MenuStore, OrderStore, Restaurant, TableStore};
+use crate::server::data_model::models::{MenuItem, MenuStore, OrderStore, Restaurant, TableStore};
+use crate::server::utils::error::RestaurantError;
 
 /// `SimpleRestaurant` is an implementation of the `Restaurant` trait.
 /// It interacts with `MenuStore`, `OrderStore`, and `TableStore` to manage
@@ -161,7 +161,7 @@ impl Restaurant for SimpleRestaurant {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::server::models::{MockMenuStore, MockOrderStore, MockTableStore};
+    use crate::server::data_model::models::{MockMenuStore, MockOrderStore, MockTableStore};
     use mockall::predicate::*;
 
     #[test]

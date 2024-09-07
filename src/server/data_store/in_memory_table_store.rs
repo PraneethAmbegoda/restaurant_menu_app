@@ -1,8 +1,8 @@
 #![deny(warnings)]
 #![deny(clippy::all)]
 
-use crate::server::error::RestaurantError;
-use crate::server::models::TableStore;
+use crate::server::data_model::models::TableStore;
+use crate::server::utils::error::RestaurantError;
 use std::sync::{Arc, Mutex};
 
 /// In-memory implementation of the `TableStore` trait.
