@@ -9,7 +9,10 @@ use crate::server::restaurant::SimpleRestaurant;
 use actix_web::{web, App, HttpServer};
 use std::sync::Arc;
 
-pub async fn main() -> std::io::Result<()> {
+pub async fn main(port: Option<u16>) -> std::io::Result<()> {
+    // Default to port 8081 if no port is provided
+    let port = port.unwrap_or(8081);
+
     // Create the restaurant instance using the SimpleRestaurant implementation
     let restaurant = Arc::new(SimpleRestaurant::new(
         Box::new(InMemoryMenuStore::default()),  // Using Default trait
@@ -29,7 +32,7 @@ pub async fn main() -> std::io::Result<()> {
             .configure(v1::routes::configure_routes) // Register routes
             .service(openapi::configure_openapi_ui()) // Serve OpenAPI docs via Swagger UI
     })
-    .bind("127.0.0.1:8081")?
+    .bind(format!("127.0.0.1:{}", port))?
     .run()
     .await
 }
