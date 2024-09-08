@@ -39,102 +39,102 @@ impl InMemoryMenuStore {
             MenuItem {
                 id: 1,
                 name: "Salad".to_string(),
-                cooking_time: 1,
+                cooking_time_minutes: 1,
             },
             MenuItem {
                 id: 2,
                 name: "Soup".to_string(),
-                cooking_time: 5,
+                cooking_time_minutes: 5,
             },
             MenuItem {
                 id: 3,
                 name: "Sandwich".to_string(),
-                cooking_time: 7,
+                cooking_time_minutes: 7,
             },
             MenuItem {
                 id: 4,
                 name: "Pasta".to_string(),
-                cooking_time: 12,
+                cooking_time_minutes: 12,
             },
             MenuItem {
                 id: 5,
                 name: "Steak".to_string(),
-                cooking_time: 15,
+                cooking_time_minutes: 15,
             },
             MenuItem {
                 id: 6,
                 name: "Burger".to_string(),
-                cooking_time: 10,
+                cooking_time_minutes: 10,
             },
             MenuItem {
                 id: 7,
                 name: "Pizza".to_string(),
-                cooking_time: 14,
+                cooking_time_minutes: 14,
             },
             MenuItem {
                 id: 8,
                 name: "Tacos".to_string(),
-                cooking_time: 8,
+                cooking_time_minutes: 8,
             },
             MenuItem {
                 id: 9,
                 name: "Fries".to_string(),
-                cooking_time: 3,
+                cooking_time_minutes: 3,
             },
             MenuItem {
                 id: 10,
                 name: "Stir Fry".to_string(),
-                cooking_time: 10,
+                cooking_time_minutes: 10,
             },
             MenuItem {
                 id: 11,
                 name: "Omelette".to_string(),
-                cooking_time: 4,
+                cooking_time_minutes: 4,
             },
             MenuItem {
                 id: 12,
                 name: "Pancakes".to_string(),
-                cooking_time: 6,
+                cooking_time_minutes: 6,
             },
             MenuItem {
                 id: 13,
                 name: "Sushi".to_string(),
-                cooking_time: 12,
+                cooking_time_minutes: 12,
             },
             MenuItem {
                 id: 14,
                 name: "Curry".to_string(),
-                cooking_time: 15,
+                cooking_time_minutes: 15,
             },
             MenuItem {
                 id: 15,
                 name: "Fish & Chips".to_string(),
-                cooking_time: 13,
+                cooking_time_minutes: 13,
             },
             MenuItem {
                 id: 16,
                 name: "Fried Rice".to_string(),
-                cooking_time: 9,
+                cooking_time_minutes: 9,
             },
             MenuItem {
                 id: 17,
                 name: "Ramen".to_string(),
-                cooking_time: 14,
+                cooking_time_minutes: 14,
             },
             MenuItem {
                 id: 18,
                 name: "Burrito".to_string(),
-                cooking_time: 8,
+                cooking_time_minutes: 8,
             },
             MenuItem {
                 id: 19,
                 name: "Waffles".to_string(),
-                cooking_time: 5,
+                cooking_time_minutes: 5,
             },
             MenuItem {
                 id: 20,
                 name: "Salmon".to_string(),
-                cooking_time: 13,
+                cooking_time_minutes: 13,
             },
         ];
         Self::new(predefined_menus)
@@ -184,12 +184,12 @@ mod tests {
             MenuItem {
                 id: 1,
                 name: "Custom Item 1".to_string(),
-                cooking_time: 5,
+                cooking_time_minutes: 5,
             },
             MenuItem {
                 id: 2,
                 name: "Custom Item 2".to_string(),
-                cooking_time: 10,
+                cooking_time_minutes: 10,
             },
         ];
         let store = InMemoryMenuStore::new(custom_items.clone());

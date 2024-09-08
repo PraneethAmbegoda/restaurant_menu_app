@@ -19,7 +19,7 @@ async fn test_add_item() {
     let menu_store = InMemoryMenuStore::new(vec![MenuItem {
         id: 1,
         name: "Burger".to_string(),
-        cooking_time: 10,
+        cooking_time_minutes: 10,
     }]);
     let order_store = InMemoryOrderStore::new();
     let table_store = InMemoryTableStore::new();
@@ -52,7 +52,7 @@ async fn test_add_item_to_nonexistent_table() {
     let menu_store = InMemoryMenuStore::new(vec![MenuItem {
         id: 1,
         name: "Burger".to_string(),
-        cooking_time: 10,
+        cooking_time_minutes: 10,
     }]);
     let order_store = InMemoryOrderStore::new();
     let table_store = InMemoryTableStore::new();
@@ -85,7 +85,7 @@ async fn test_remove_item() {
     let menu_store = InMemoryMenuStore::new(vec![MenuItem {
         id: 1,
         name: "Burger".to_string(),
-        cooking_time: 10,
+        cooking_time_minutes: 10,
     }]);
     let order_store = InMemoryOrderStore::new();
     let table_store = InMemoryTableStore::new();
@@ -108,7 +108,7 @@ async fn test_remove_item() {
     let item = MenuItem {
         id: 1,
         name: "Burger".to_string(),
-        cooking_time: 10,
+        cooking_time_minutes: 10,
     };
     restaurant.add_item(1, item.id).unwrap();
 
@@ -125,7 +125,7 @@ async fn test_remove_nonexistent_item() {
     let menu_store = InMemoryMenuStore::new(vec![MenuItem {
         id: 1,
         name: "Burger".to_string(),
-        cooking_time: 10,
+        cooking_time_minutes: 10,
     }]);
     let order_store = InMemoryOrderStore::new();
     let table_store = InMemoryTableStore::new();
@@ -158,7 +158,7 @@ async fn test_get_items() {
     let menu_store = InMemoryMenuStore::new(vec![MenuItem {
         id: 1,
         name: "Burger".to_string(),
-        cooking_time: 10,
+        cooking_time_minutes: 10,
     }]);
     let order_store = InMemoryOrderStore::new();
     let table_store = InMemoryTableStore::new();
@@ -181,7 +181,7 @@ async fn test_get_items() {
     let item = MenuItem {
         id: 1,
         name: "Burger".to_string(),
-        cooking_time: 10,
+        cooking_time_minutes: 10,
     };
     restaurant.add_item(1, item.id).unwrap();
 
@@ -203,7 +203,7 @@ async fn test_get_items_for_nonexistent_table() {
     let menu_store = InMemoryMenuStore::new(vec![MenuItem {
         id: 1,
         name: "Burger".to_string(),
-        cooking_time: 10,
+        cooking_time_minutes: 10,
     }]);
     let order_store = InMemoryOrderStore::new();
     let table_store = InMemoryTableStore::new();
@@ -236,7 +236,7 @@ async fn test_get_item() {
     let menu_store = InMemoryMenuStore::new(vec![MenuItem {
         id: 1,
         name: "Burger".to_string(),
-        cooking_time: 10,
+        cooking_time_minutes: 10,
     }]);
     let order_store = InMemoryOrderStore::new();
     let table_store = InMemoryTableStore::new();
@@ -259,7 +259,7 @@ async fn test_get_item() {
     let item = MenuItem {
         id: 1,
         name: "Burger".to_string(),
-        cooking_time: 10,
+        cooking_time_minutes: 10,
     };
     restaurant.add_item(1, item.id).unwrap();
 
@@ -280,7 +280,7 @@ async fn test_get_item_from_non_existent_table() {
     let menu_store = InMemoryMenuStore::new(vec![MenuItem {
         id: 1,
         name: "Burger".to_string(),
-        cooking_time: 10,
+        cooking_time_minutes: 10,
     }]);
     let order_store = InMemoryOrderStore::new();
     let table_store = InMemoryTableStore::new();
@@ -313,7 +313,7 @@ async fn test_concurrent_add_remove_items() {
     let menu_store = InMemoryMenuStore::new(vec![MenuItem {
         id: 1,
         name: "Burger".to_string(),
-        cooking_time: 10,
+        cooking_time_minutes: 10,
     }]);
     let order_store = InMemoryOrderStore::new();
     let table_store = InMemoryTableStore::new();

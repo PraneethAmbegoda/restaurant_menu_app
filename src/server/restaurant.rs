@@ -181,7 +181,7 @@ mod tests {
             Ok(vec![MenuItem {
                 id: item_id,
                 name: "Burger".to_string(),
-                cooking_time: 10,
+                cooking_time_minutes: 10,
             }])
         });
 
@@ -293,7 +293,7 @@ mod tests {
         let menu_item = MenuItem {
             id: item_id,
             name: "Burger".to_string(),
-            cooking_time: 10,
+            cooking_time_minutes: 10,
         };
 
         mock_table_store
@@ -361,7 +361,7 @@ mod tests {
         let menu_item = MenuItem {
             id: item_id,
             name: "Burger".to_string(),
-            cooking_time: 10,
+            cooking_time_minutes: 10,
         };
 
         mock_table_store

@@ -282,7 +282,7 @@ mod tests {
             Ok(vec![MenuItem {
                 id: 1,
                 name: "Burger".to_string(),
-                cooking_time: 10,
+                cooking_time_minutes: 10,
             }])
         });
 
@@ -327,7 +327,7 @@ mod tests {
             Ok(vec![MenuItem {
                 id: 1,
                 name: "Burger".to_string(),
-                cooking_time: 10,
+                cooking_time_minutes: 10,
             }])
         });
 
@@ -369,7 +369,7 @@ mod tests {
             Ok(vec![MenuItem {
                 id: 10,
                 name: "Burger".to_string(),
-                cooking_time: 10,
+                cooking_time_minutes: 10,
             }])
         });
 
@@ -488,12 +488,12 @@ mod tests {
                 MenuItem {
                     id: 1,
                     name: "Burger".to_string(),
-                    cooking_time: 10,
+                    cooking_time_minutes: 10,
                 },
                 MenuItem {
                     id: 2,
                     name: "Pizza".to_string(),
-                    cooking_time: 15,
+                    cooking_time_minutes: 15,
                 },
             ])
         });
@@ -587,12 +587,12 @@ mod tests {
                 MenuItem {
                     id: 1,
                     name: "Burger".to_string(),
-                    cooking_time: 10,
+                    cooking_time_minutes: 10,
                 },
                 MenuItem {
                     id: 2,
                     name: "Pizza".to_string(),
-                    cooking_time: 15,
+                    cooking_time_minutes: 15,
                 },
             ])
         });
@@ -679,7 +679,7 @@ mod tests {
             Ok(vec![MenuItem {
                 id: 1,
                 name: "Burger".to_string(),
-                cooking_time: 10,
+                cooking_time_minutes: 10,
             }])
         });
 
@@ -720,7 +720,7 @@ mod tests {
             Ok(vec![MenuItem {
                 id: 1,
                 name: "Burger".to_string(),
-                cooking_time: 10,
+                cooking_time_minutes: 10,
             }])
         });
 

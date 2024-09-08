@@ -29,7 +29,7 @@ struct Args {
 struct MenuItem {
     id: u32,
     name: String,
-    cooking_time: u32,
+    cooking_time_minutes: u32,
 }
 
 /// The main function starts the server and enters the interactive options loop for the client.
@@ -415,7 +415,7 @@ async fn run_simulation(client: &reqwest::Client, base_url: &str) {
             for item in menu_items {
                 println!(
                     "For Table: {}  Menu Item ID: {}, Name: {}, Cooking Time: {} minutes",
-                    table_id, item.id, item.name, item.cooking_time
+                    table_id, item.id, item.name, item.cooking_time_minutes
                 );
             }
         });

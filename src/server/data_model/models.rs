@@ -11,7 +11,7 @@ use utoipa::ToSchema;
 /// This struct models a single menu item, which includes:
 /// - `id`: A unique identifier for the menu item.
 /// - `name`: The name of the menu item.
-/// - `cooking_time`: The time it takes to prepare the item in minutes.
+/// - `cooking_time_minutes`: The time it takes to prepare the item in minutes.
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, ToSchema)]
 pub struct MenuItem {
     /// Unique identifier of the menu item.
@@ -19,7 +19,7 @@ pub struct MenuItem {
     /// Name of the menu item.
     pub name: String,
     /// The cooking time required for this menu item (in minutes).
-    pub cooking_time: u64,
+    pub cooking_time_minutes: u64,
 }
 
 /// The `MenuStore` trait defines the behavior of a menu store.
