@@ -12,6 +12,15 @@ use crate::server::restaurant::SimpleRestaurant;
 use actix_web::{web, App, HttpServer};
 use std::sync::Arc;
 
+/// Main entry point for starting the HTTP server.
+///
+/// This function sets up the server, configures routes, and serves the OpenAPI documentation via Swagger UI.
+///
+/// # Arguments
+/// * `port` - Optional port number to bind the server to. If not provided, defaults to port 8081.
+///
+/// # Returns
+/// This function returns a `Result` that either contains `Ok` with an empty value indicating success or an `Err` in case of an I/O error.
 pub async fn main(port: Option<u16>) -> std::io::Result<()> {
     // Default to port 8081 if no port is provided
     let port = port.unwrap_or(8081);

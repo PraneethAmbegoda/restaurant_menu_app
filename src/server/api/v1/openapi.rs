@@ -9,42 +9,70 @@ use utoipa::OpenApi;
 use utoipa::ToSchema;
 use utoipa_swagger_ui::SwaggerUi;
 
-/// Success response with a message
+/// Struct representing a success response containing a message.
+///
+/// This struct is used for API responses that only contain a success message
+/// and no additional data, such as the result of a POST or DELETE request.
 #[derive(Serialize, ToSchema)]
 pub struct SuccessResponseMessage {
+    /// Status of the response, typically "ok" for success.
     pub status: String,
+    /// The message detailing the result of the request.
     pub message: String,
 }
 
-/// Success response with a list of menu items
+/// Struct representing a success response with a list of menu items.
+///
+/// This is used in API responses that return a list of `MenuItem`s, such as a request
+/// for all available menu items.
 #[derive(Serialize, ToSchema)]
 pub struct SuccessResponseMenuItems {
+    /// Status of the response, typically "ok" for success.
     pub status: String,
+    /// A list of menu items returned by the request.
     pub data: Vec<MenuItem>,
 }
 
-/// Success response with a menu item
+/// Struct representing a success response with a single menu item.
+///
+/// This is used in API responses that return a single `MenuItem`, such as a request
+/// for a specific menu item.
 #[derive(Serialize, ToSchema)]
 pub struct SuccessResponseMenuItem {
+    /// Status of the response, typically "ok" for success.
     pub status: String,
+    /// The specific menu item returned by the request.
     pub data: MenuItem,
 }
 
-/// Success response with a list of tables
+/// Struct representing a success response with a list of tables.
+///
+/// This is used in API responses that return a list of available tables
+/// in the restaurant.
 #[derive(Serialize, ToSchema)]
 pub struct SuccessResponseTables {
+    /// Status of the response, typically "ok" for success.
     pub status: String,
+    /// A list of table IDs available in the restaurant.
     pub data: Vec<u32>,
 }
 
-/// Structure for error responses.
+/// Struct representing an error response.
+///
+/// This is used in API responses where an error occurred,
+/// such as a failed request due to invalid data.
 #[derive(Serialize, ToSchema)]
 pub struct ErrorResponse {
+    /// Status of the response, typically "error" for error cases.
     pub status: String,
+    /// The error message detailing the issue.
     pub message: String,
 }
 
-/// This struct serves as the OpenAPI entry point. It collects all the routes and schemas.
+/// Struct representing the OpenAPI documentation entry point.
+///
+/// This struct collects all the API routes and schemas to generate OpenAPI
+/// documentation for the restaurant API.
 #[derive(OpenApi)]
 #[openapi(
     paths(
@@ -69,7 +97,11 @@ pub struct ErrorResponse {
 )]
 pub struct ApiDoc;
 
-/// Function to serve OpenAPI documentation via Swagger UI.
+/// Configures and serves the OpenAPI documentation via Swagger UI.
+///
+/// This function sets up Swagger UI at the `/swagger-ui` endpoint,
+/// which provides a user interface for exploring and interacting with
+/// the restaurant API's documentation.
 pub fn configure_openapi_ui() -> SwaggerUi {
     SwaggerUi::new("/swagger-ui/{_:.*}").url("/api-doc/openapi.json", ApiDoc::openapi())
 }

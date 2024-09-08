@@ -32,6 +32,10 @@ struct MenuItem {
     cooking_time: u32,
 }
 
+/// The main function starts the server and enters the interactive options loop for the client.
+///
+/// # Returns
+/// * `std::io::Result<()>` - Result indicating success or failure.
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
     // Parse command-line arguments
@@ -56,7 +60,6 @@ async fn main() -> std::io::Result<()> {
     Ok(())
 }
 
-/// Starts the server in a separate thread
 fn start_server_in_thread(port: u16) {
     thread::spawn(move || {
         let runtime = tokio::runtime::Runtime::new().unwrap();
@@ -66,7 +69,6 @@ fn start_server_in_thread(port: u16) {
     });
 }
 
-/// Displays the introduction and available options to the user
 fn display_intro(port: u16) {
     println!("\n==================== Restaurant Management Client ====================\n");
     println!("Welcome to the Restaurant Management Client.");
@@ -87,7 +89,6 @@ fn display_intro(port: u16) {
     println!("=======================================================================\n");
 }
 
-/// Interactive loop to handle client operations
 async fn interactive_loop(client: &Client, base_url: &str) {
     loop {
         display_menu_options();
@@ -111,7 +112,6 @@ async fn interactive_loop(client: &Client, base_url: &str) {
     }
 }
 
-/// Displays the available menu options
 fn display_menu_options() {
     println!(
         "\nPlease select an operation:\n\
@@ -126,7 +126,6 @@ fn display_menu_options() {
     );
 }
 
-/// Reads user input from the command line
 fn read_user_input() -> String {
     let mut input = String::new();
     std::io::stdin()
@@ -135,7 +134,6 @@ fn read_user_input() -> String {
     input
 }
 
-/// Retrieves and displays available menus
 async fn get_menus(client: &Client, base_url: &str) {
     let url = format!("{}/api/v1/menus", base_url);
     let response = client.get(&url).send().await;
@@ -146,7 +144,6 @@ async fn get_menus(client: &Client, base_url: &str) {
     }
 }
 
-/// Retrieves and displays available tables
 async fn get_tables(client: &Client, base_url: &str) {
     let url = format!("{}/api/v1/tables", base_url);
     let response = client.get(&url).send().await;
@@ -157,7 +154,6 @@ async fn get_tables(client: &Client, base_url: &str) {
     }
 }
 
-/// Adds a menu item to a table based on user input
 async fn add_menu_item(client: &Client, base_url: &str) {
     let (table_id, menu_item_id) = get_table_and_menu_ids();
 
@@ -173,7 +169,6 @@ async fn add_menu_item(client: &Client, base_url: &str) {
     }
 }
 
-/// Removes a menu item from a table based on user input
 async fn remove_menu_item(client: &Client, base_url: &str) {
     let (table_id, menu_item_id) = get_table_and_menu_ids();
 
@@ -192,7 +187,6 @@ async fn remove_menu_item(client: &Client, base_url: &str) {
     }
 }
 
-/// Gets orders for a specific table
 async fn get_table_orders(client: &Client, base_url: &str) {
     let table_id = get_table_id();
     let url = format!("{}/api/v1/get_items/{}", base_url, table_id);
@@ -208,7 +202,6 @@ async fn get_table_orders(client: &Client, base_url: &str) {
     }
 }
 
-/// Gets a specific menu item ordered for a table
 async fn get_specific_menu_item(client: &Client, base_url: &str) {
     let (table_id, menu_item_id) = get_table_and_menu_ids();
 
@@ -226,7 +219,6 @@ async fn get_specific_menu_item(client: &Client, base_url: &str) {
     }
 }
 
-/// Runs the simulation: adding/removing menu items from tables in parallel
 async fn run_simulation(client: &reqwest::Client, base_url: &str) {
     // Ask the user for the number of tables to simulate
     println!("Enter the number of tables for the simulation (max 100, default 10): ");
@@ -244,7 +236,7 @@ async fn run_simulation(client: &reqwest::Client, base_url: &str) {
         "1. Select Tables for Simulation: A random selection of {} tables is performed.",
         num_tables
     );
-    println!("2. Simultaneous Add and Remove Operations: Menu items are added and removed in parallel, ensuring that only items that were added are removed.");
+    println!("2. Simultaneous Add and Remove Operations: Menu items are added parallel and then removed in parallel, ensuring that only items that were added are removed.");
     println!("3. Retain Some Items After Simulation: Some items are randomly selected to remain on the table.");
     println!("4. Final Status Printing: The final status of each table is printed in parrellel.\n");
     println!("==========================================\n");
@@ -279,7 +271,6 @@ async fn run_simulation(client: &reqwest::Client, base_url: &str) {
         .collect();
     let table_items: Arc<Mutex<HashMap<u32, Vec<u32>>>> = Arc::new(Mutex::new(HashMap::new()));
 
-    // Add items to tables
     let mut add_handles = Vec::new();
     for &table_id in &selected_tables {
         let client_clone = client.clone();
@@ -341,7 +332,6 @@ async fn run_simulation(client: &reqwest::Client, base_url: &str) {
         handle.await.unwrap();
     }
 
-    // Remove items from tables
     let mut remove_handles = Vec::new();
     for &table_id in &selected_tables {
         let client_clone = client.clone();
@@ -442,7 +432,6 @@ async fn run_simulation(client: &reqwest::Client, base_url: &str) {
     println!("Simulation complete.");
 }
 
-/// Gets the table and menu IDs from the user
 fn get_table_and_menu_ids() -> (u32, u32) {
     println!("Enter table number(positive interger):");
     let table_id = read_user_input().trim().parse().unwrap();
@@ -453,13 +442,11 @@ fn get_table_and_menu_ids() -> (u32, u32) {
     (table_id, menu_item_id)
 }
 
-/// Gets the table ID from the user
 fn get_table_id() -> u32 {
     println!("Enter table number(positive interger):");
     read_user_input().trim().parse().unwrap()
 }
 
-/// Function to wait until the server is ready and accepting connections
 async fn wait_for_server_start(port: u16) -> std::io::Result<()> {
     let addr = format!("127.0.0.1:{}", port);
     let mut retries = 10;

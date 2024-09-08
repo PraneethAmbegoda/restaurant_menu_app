@@ -53,12 +53,12 @@ pub async fn add_item(
     let restaurant = &data.restaurant;
     let table_id = match parse_path_param(&params.0, "table ID") {
         Ok(id) => id,
-        Err(e) => return error_response(400, &e), // Return the error response if validation fails
+        Err(e) => return error_response(400, &e),
     };
 
     let item_id = match parse_path_param(&params.1, "item ID") {
         Ok(id) => id,
-        Err(e) => return error_response(400, &e), // Return the error response if validation fails
+        Err(e) => return error_response(400, &e),
     };
     match restaurant.add_item(table_id, item_id) {
         Ok(_) => success_message_response(&format!(
@@ -102,12 +102,12 @@ pub async fn remove_item(
 ) -> impl Responder {
     let table_id = match parse_path_param(&params.0, "table ID") {
         Ok(id) => id,
-        Err(e) => return error_response(400, &e), // Return the error response if validation fails
+        Err(e) => return error_response(400, &e),
     };
 
     let item_id = match parse_path_param(&params.1, "item ID") {
         Ok(id) => id,
-        Err(e) => return error_response(400, &e), // Return the error response if validation fails
+        Err(e) => return error_response(400, &e),
     };
     let restaurant = &data.restaurant;
     match restaurant.remove_item(table_id, item_id) {
@@ -149,7 +149,7 @@ pub async fn get_items(data: web::Data<AppState>, table_id: web::Path<String>) -
     let restaurant = &data.restaurant;
     let table_id = match parse_path_param(&table_id, "table ID") {
         Ok(id) => id,
-        Err(e) => return error_response(400, &e), // Return the error response if validation fails
+        Err(e) => return error_response(400, &e),
     };
     match restaurant.get_items(table_id) {
         Ok(items) => success_response(items),
@@ -191,12 +191,12 @@ pub async fn get_item(
     let restaurant = &data.restaurant;
     let table_id = match parse_path_param(&params.0, "table ID") {
         Ok(id) => id,
-        Err(e) => return error_response(400, &e), // Return the error response if validation fails
+        Err(e) => return error_response(400, &e),
     };
 
     let item_id = match parse_path_param(&params.1, "item ID") {
         Ok(id) => id,
-        Err(e) => return error_response(400, &e), // Return the error response if validation fails
+        Err(e) => return error_response(400, &e),
     };
     match restaurant.get_item(table_id, item_id) {
         Ok(item) => success_response(item),
@@ -321,7 +321,7 @@ mod tests {
 
         mock_table_store
             .expect_get_all_tables()
-            .returning(|| Ok(vec![2, 3])); // Table 1 doesn't exist
+            .returning(|| Ok(vec![2, 3]));
 
         mock_menu_store.expect_get_all_menus().returning(|| {
             Ok(vec![MenuItem {
@@ -331,7 +331,6 @@ mod tests {
             }])
         });
 
-        // Default expectation for add_item (won't be called)
         mock_order_store.expect_add_item().returning(|_, _| Ok(()));
 
         let restaurant = Arc::new(SimpleRestaurant {
@@ -364,7 +363,7 @@ mod tests {
 
         mock_table_store
             .expect_get_all_tables()
-            .returning(|| Ok(vec![1, 2, 3])); // Table 1 doesn't exist
+            .returning(|| Ok(vec![1, 2, 3]));
 
         mock_menu_store.expect_get_all_menus().returning(|| {
             Ok(vec![MenuItem {
@@ -374,7 +373,6 @@ mod tests {
             }])
         });
 
-        // Default expectation for add_item (won't be called)
         mock_order_store.expect_add_item().returning(|_, _| Ok(()));
 
         let restaurant = Arc::new(SimpleRestaurant {
@@ -442,9 +440,8 @@ mod tests {
 
         mock_table_store
             .expect_get_all_tables()
-            .returning(|| Ok(vec![2, 3])); // Table 1 doesn't exist
+            .returning(|| Ok(vec![2, 3]));
 
-        // Default expectation for remove_item (won't be called)
         mock_order_store
             .expect_remove_item()
             .returning(|_, _| Ok(()));
@@ -538,14 +535,12 @@ mod tests {
 
         mock_table_store
             .expect_get_all_tables()
-            .returning(|| Ok(vec![2, 3])); // Table 1 doesn't exist
+            .returning(|| Ok(vec![2, 3]));
 
-        // Default expectation for get_item_ids (won't be called)
         mock_order_store
             .expect_get_item_ids()
             .returning(|_| Ok(vec![]));
 
-        // Default expectation for get_all_menus (won't be called)
         mock_menu_store
             .expect_get_all_menus()
             .returning(|| Ok(vec![]));
@@ -638,14 +633,12 @@ mod tests {
 
         mock_table_store
             .expect_get_all_tables()
-            .returning(|| Ok(vec![2, 3])); // Table 1 doesn't exist
+            .returning(|| Ok(vec![2, 3]));
 
-        // Default expectation for get_item_id (won't be called)
         mock_order_store
             .expect_get_item_id()
             .returning(|_, _| Ok(0));
 
-        // Default expectation for get_all_menus (won't be called)
         mock_menu_store
             .expect_get_all_menus()
             .returning(|| Ok(vec![]));
@@ -678,7 +671,6 @@ mod tests {
         let mock_order_store = MockOrderStore::new();
         let mut mock_menu_store = MockMenuStore::new();
 
-        // Setting up expectations for valid tables and menus (won't be used in this case)
         mock_table_store
             .expect_get_all_tables()
             .returning(|| Ok(vec![1, 2, 3]));
@@ -720,7 +712,6 @@ mod tests {
         let mock_order_store = MockOrderStore::new();
         let mut mock_menu_store = MockMenuStore::new();
 
-        // Setting up expectations for valid tables and menus
         mock_table_store
             .expect_get_all_tables()
             .returning(|| Ok(vec![1, 2, 3]));
@@ -747,7 +738,6 @@ mod tests {
         )
         .await;
 
-        // Invalid item ID
         let req = test::TestRequest::post()
             .uri("/api/v1/add_item/1/invalid")
             .to_request();
@@ -761,7 +751,6 @@ mod tests {
         let mut mock_table_store = MockTableStore::new();
         let mock_order_store = MockOrderStore::new();
 
-        // Setting up expectations for valid tables
         mock_table_store
             .expect_get_all_tables()
             .returning(|| Ok(vec![1, 2, 3]));
@@ -794,7 +783,6 @@ mod tests {
         let mut mock_table_store = MockTableStore::new();
         let mock_order_store = MockOrderStore::new();
 
-        // Setting up expectations for valid tables
         mock_table_store
             .expect_get_all_tables()
             .returning(|| Ok(vec![1, 2, 3]));
@@ -813,7 +801,6 @@ mod tests {
         )
         .await;
 
-        // Invalid item ID
         let req = test::TestRequest::delete()
             .uri("/api/v1/remove_item/1/invalid")
             .to_request();
@@ -828,7 +815,6 @@ mod tests {
         let mock_order_store = MockOrderStore::new();
         let mock_menu_store = MockMenuStore::new();
 
-        // Setting up expectations for valid tables (won't be used in this case)
         mock_table_store
             .expect_get_all_tables()
             .returning(|| Ok(vec![1, 2, 3]));
@@ -862,7 +848,6 @@ mod tests {
         let mock_order_store = MockOrderStore::new();
         let mock_menu_store = MockMenuStore::new();
 
-        // Setting up expectations for valid tables (won't be used in this case)
         mock_table_store
             .expect_get_all_tables()
             .returning(|| Ok(vec![1, 2, 3]));
@@ -896,7 +881,6 @@ mod tests {
         let mock_order_store = MockOrderStore::new();
         let mock_menu_store = MockMenuStore::new();
 
-        // Setting up expectations for valid tables and items (won't be used in this case)
         mock_table_store
             .expect_get_all_tables()
             .returning(|| Ok(vec![1, 2, 3]));

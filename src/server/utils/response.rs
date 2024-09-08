@@ -6,6 +6,12 @@ use actix_web::HttpResponse;
 use serde_json::json;
 
 /// Returns a success response with data for GET requests.
+///
+/// # Arguments
+/// * `data` - The data to be included in the success response.
+///
+/// # Returns
+/// A `HttpResponse` with a JSON body containing the status "ok" and the provided data.
 pub fn success_response<T>(data: T) -> HttpResponse
 where
     T: serde::Serialize,
@@ -17,6 +23,13 @@ where
 }
 
 /// Returns an error response with a custom status code and message.
+///
+/// # Arguments
+/// * `status_code` - The HTTP status code for the error response.
+/// * `message` - The error message to be included in the response.
+///
+/// # Returns
+/// A `HttpResponse` with the specified status code and a JSON body containing the status "error" and the error message.
 pub fn error_response(status_code: u16, message: &str) -> HttpResponse {
     HttpResponse::build(actix_web::http::StatusCode::from_u16(status_code).unwrap()).json(json!({
         "status": "error",
@@ -25,6 +38,12 @@ pub fn error_response(status_code: u16, message: &str) -> HttpResponse {
 }
 
 /// Returns a success response with a message for POST/DELETE requests.
+///
+/// # Arguments
+/// * `message` - The success message to be included in the response.
+///
+/// # Returns
+/// A `HttpResponse` with a JSON body containing the status "ok" and the provided message.
 pub fn success_message_response(message: &str) -> HttpResponse {
     HttpResponse::Ok().json(json!({
         "status": "ok",
@@ -32,7 +51,13 @@ pub fn success_message_response(message: &str) -> HttpResponse {
     }))
 }
 
-/// converts restaurant erros to http response erros
+/// Converts `RestaurantError` into an appropriate HTTP error response.
+///
+/// # Arguments
+/// * `err` - The `RestaurantError` to be converted.
+///
+/// # Returns
+/// A `HttpResponse` representing the appropriate HTTP error based on the `RestaurantError`.
 pub fn restaurant_error_to_response(err: RestaurantError) -> HttpResponse {
     match err {
         RestaurantError::LockError(_) => HttpResponse::InternalServerError().finish(),
