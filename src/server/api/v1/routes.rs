@@ -1,3 +1,6 @@
+#![deny(warnings)]
+#![deny(clippy::all)]
+
 use crate::server::api::v1::handlers::add_item;
 use crate::server::api::v1::handlers::get_item;
 use crate::server::api::v1::handlers::get_items;

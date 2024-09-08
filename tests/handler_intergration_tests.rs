@@ -1,3 +1,6 @@
+#![deny(warnings)]
+#![deny(clippy::all)]
+
 use actix_web::{http::StatusCode, test, web, App};
 use futures::future::join_all;
 use restaurant_menu_app::server::api::v1::handlers::AppState;

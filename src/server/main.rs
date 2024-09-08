@@ -1,3 +1,6 @@
+#![deny(warnings)]
+#![deny(clippy::all)]
+
 use crate::server::api::v1;
 use crate::server::api::v1::handlers;
 use crate::server::data_model::models::Restaurant;

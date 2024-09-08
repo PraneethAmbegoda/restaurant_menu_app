@@ -1,3 +1,6 @@
+#![deny(warnings)]
+#![deny(clippy::all)]
+
 use crate::server::api::v1;
 use crate::server::data_model::models;
 use crate::server::data_model::models::MenuItem;

@@ -1,3 +1,6 @@
+#![deny(warnings)]
+#![deny(clippy::all)]
+
 use clap::Parser;
 use rand::prelude::SliceRandom;
 use rand::rngs::StdRng;
