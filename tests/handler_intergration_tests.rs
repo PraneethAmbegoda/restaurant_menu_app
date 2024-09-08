@@ -7,6 +7,7 @@ use restaurant_menu_app::server::data_store::in_memory_menu_store::InMemoryMenuS
 use restaurant_menu_app::server::data_store::in_memory_order_store::InMemoryOrderStore;
 use restaurant_menu_app::server::data_store::in_memory_table_store::InMemoryTableStore;
 use restaurant_menu_app::server::restaurant::SimpleRestaurant;
+use serde_json::Value;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
@@ -188,7 +189,8 @@ async fn test_get_items() {
 
     assert_eq!(resp.status(), StatusCode::OK);
 
-    let items: Vec<MenuItem> = test::read_body_json(resp).await;
+    let json_response: Value = test::read_body_json(resp).await;
+    let items: Vec<MenuItem> = serde_json::from_value(json_response["data"].clone()).unwrap();
     assert_eq!(items.len(), 1);
     assert_eq!(items[0].name, "Burger");
 }
@@ -265,7 +267,8 @@ async fn test_get_item() {
 
     assert_eq!(resp.status(), StatusCode::OK);
 
-    let fetched_item: MenuItem = test::read_body_json(resp).await;
+    let json_response: Value = test::read_body_json(resp).await;
+    let fetched_item: MenuItem = serde_json::from_value(json_response["data"].clone()).unwrap();
     assert_eq!(fetched_item.name, "Burger");
 }
 
@@ -390,7 +393,8 @@ async fn test_concurrent_add_remove_items() {
 
     assert_eq!(resp.status(), StatusCode::OK);
 
-    let items: Vec<MenuItem> = test::read_body_json(resp).await;
+    let json_response: Value = test::read_body_json(resp).await;
+    let items: Vec<MenuItem> = serde_json::from_value(json_response["data"].clone()).unwrap();
 
     // After adding 10 times and removing 5 times, there should be 5 items remaining
     assert_eq!(items.len(), 5);

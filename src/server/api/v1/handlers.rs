@@ -1,8 +1,15 @@
 #![deny(warnings)]
 #![deny(clippy::all)]
 
+#[allow(unused_imports)]
+use crate::server::api::v1::openapi::{
+    ErrorResponse, SuccessResponseMenuItem, SuccessResponseMenuItems, SuccessResponseMessage,
+    SuccessResponseTables,
+};
 use crate::server::data_model::models::Restaurant;
 use crate::server::utils::error::RestaurantError;
+use crate::server::utils::response::{error_response, success_message_response, success_response};
+
 use actix_web::{web, HttpResponse, Responder};
 use std::sync::Arc;
 
@@ -28,15 +35,15 @@ pub struct AppState {
     post,
     path = "/api/v1/add_item/{table_id}/{menu_item_id}",
     responses(
-        (status = 200, description = "Menu ttem added successfully"),
-        (status = 404, description = "Table or menu item not found"),
-        (status = 400, description = "Bad request"),
+        (status = 200, description = "Menu item added successfully", body = SuccessResponseMessage),
+        (status = 404, description = "Table or menu item not found", body = ErrorResponse),
+        (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 500, description = "Internal server error")
     ),
     params(
         ("table_id" = u32, description = "ID of the table"),
-        ("menu_item_id" = u32, description = "ID of the Menu"),
-    ),
+        ("menu_item_id" = u32, description = "ID of the menu item")
+    )
 )]
 pub async fn add_item(
     data: web::Data<AppState>,
@@ -45,15 +52,18 @@ pub async fn add_item(
     let restaurant = &data.restaurant;
     let table_id = match parse_path_param(&params.0, "table ID") {
         Ok(id) => id,
-        Err(e) => return e, // Return the error response if validation fails
+        Err(e) => return error_response(400, &e), // Return the error response if validation fails
     };
 
     let item_id = match parse_path_param(&params.1, "item ID") {
         Ok(id) => id,
-        Err(e) => return e, // Return the error response if validation fails
+        Err(e) => return error_response(400, &e), // Return the error response if validation fails
     };
     match restaurant.add_item(table_id, item_id) {
-        Ok(_) => HttpResponse::Ok().json("Item added successfully"),
+        Ok(_) => success_message_response(&format!(
+            "Menu item with item id: {} added successfully for table with table id {}",
+            item_id, table_id
+        )),
         Err(e) => restaurant_error_to_response(e),
     }
 }
@@ -75,9 +85,9 @@ pub async fn add_item(
     delete,
     path = "/api/v1/remove_item/{table_id}/{menu_item_id}",
     responses(
-        (status = 200, description = "Menu Item removed successfully"),
-        (status = 404, description = "Table or menu item not found"),
-        (status = 400, description = "Bad request"),
+        (status = 200, description = "Menu item removed successfully", body = SuccessResponseMessage),
+        (status = 404, description = "Table or menu item not found", body = ErrorResponse),
+        (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 500, description = "Internal server error")
     ),
     params(
@@ -91,16 +101,19 @@ pub async fn remove_item(
 ) -> impl Responder {
     let table_id = match parse_path_param(&params.0, "table ID") {
         Ok(id) => id,
-        Err(e) => return e, // Return the error response if validation fails
+        Err(e) => return error_response(400, &e), // Return the error response if validation fails
     };
 
     let item_id = match parse_path_param(&params.1, "item ID") {
         Ok(id) => id,
-        Err(e) => return e, // Return the error response if validation fails
+        Err(e) => return error_response(400, &e), // Return the error response if validation fails
     };
     let restaurant = &data.restaurant;
     match restaurant.remove_item(table_id, item_id) {
-        Ok(_) => HttpResponse::Ok().json("Item removed successfully"),
+        Ok(_) => success_message_response(&format!(
+            "Menu item with item id:{} removed from table with table id:{} successfully",
+            item_id, table_id
+        )),
         Err(e) => restaurant_error_to_response(e),
     }
 }
@@ -122,9 +135,9 @@ pub async fn remove_item(
     get,
     path = "/api/v1/get_items/{table_id}",
     responses(
-        (status = 200, description = "List of menuitems added for the table", body = [MenuItem]),
-        (status = 404, description = "Table not found or no menu items added to the table"),
-        (status = 400, description = "Bad request"),
+        (status = 200, description = "List of menu items added for the table", body = SuccessResponseMenuItems),
+        (status = 404, description = "Table not found or no menu items added to the table", body = ErrorResponse),
+        (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 500, description = "Internal server error")
     ),
     params(
@@ -135,10 +148,10 @@ pub async fn get_items(data: web::Data<AppState>, table_id: web::Path<String>) -
     let restaurant = &data.restaurant;
     let table_id = match parse_path_param(&table_id, "table ID") {
         Ok(id) => id,
-        Err(e) => return e, // Return the error response if validation fails
+        Err(e) => return error_response(400, &e), // Return the error response if validation fails
     };
     match restaurant.get_items(table_id) {
-        Ok(items) => HttpResponse::Ok().json(items),
+        Ok(items) => success_response(items),
         Err(e) => restaurant_error_to_response(e),
     }
 }
@@ -160,9 +173,9 @@ pub async fn get_items(data: web::Data<AppState>, table_id: web::Path<String>) -
     get,
     path = "/api/v1/get_item/{table_id}/{menu_item_id}",
     responses(
-        (status = 200, description = "Menu item details", body = MenuItem),
-        (status = 404, description = "Table or menu item not found or menu item not added to the table"),
-        (status = 400, description = "Bad request"),
+        (status = 200, description = "Menu item details", body = SuccessResponseMenuItem),
+        (status = 404, description = "Table or menu item not found or menu item not added to the table", body = ErrorResponse),
+        (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 500, description = "Internal server error")
     ),
     params(
@@ -177,15 +190,15 @@ pub async fn get_item(
     let restaurant = &data.restaurant;
     let table_id = match parse_path_param(&params.0, "table ID") {
         Ok(id) => id,
-        Err(e) => return e, // Return the error response if validation fails
+        Err(e) => return error_response(400, &e), // Return the error response if validation fails
     };
 
     let item_id = match parse_path_param(&params.1, "item ID") {
         Ok(id) => id,
-        Err(e) => return e, // Return the error response if validation fails
+        Err(e) => return error_response(400, &e), // Return the error response if validation fails
     };
     match restaurant.get_item(table_id, item_id) {
-        Ok(item) => HttpResponse::Ok().json(item),
+        Ok(item) => success_response(item),
         Err(e) => restaurant_error_to_response(e),
     }
 }
@@ -204,14 +217,14 @@ pub async fn get_item(
     get,
     path = "/api/v1/tables",
     responses(
-        (status = 200, description = "List of available tables", body = [u32]),
+        (status = 200, description = "List of available tables", body = SuccessResponseTables),
         (status = 500, description = "Internal server error")
     )
 )]
 pub async fn get_tables(data: web::Data<AppState>) -> impl Responder {
     let restaurant = &data.restaurant;
     match restaurant.get_all_tables() {
-        Ok(tables) => HttpResponse::Ok().json(tables),
+        Ok(tables) => success_response(tables),
         Err(e) => restaurant_error_to_response(e),
     }
 }
@@ -230,51 +243,51 @@ pub async fn get_tables(data: web::Data<AppState>) -> impl Responder {
     get,
     path = "/api/v1/menus",
     responses(
-        (status = 200, description = "List of available menus", body = [MenuItem]),
+        (status = 200, description = "List of available menus", body = SuccessResponseMenuItems),
         (status = 500, description = "Internal server error")
     )
 )]
 pub async fn get_menus(data: web::Data<AppState>) -> impl Responder {
     let restaurant = &data.restaurant;
     match restaurant.get_all_menus() {
-        Ok(menus) => HttpResponse::Ok().json(menus),
+        Ok(menus) => success_response(menus),
         Err(e) => restaurant_error_to_response(e),
     }
 }
 
-fn parse_path_param(param: &str, param_name: &str) -> Result<u32, HttpResponse> {
+fn parse_path_param(param: &str, param_name: &str) -> Result<u32, String> {
     match param.parse::<u32>() {
         Ok(id) => Ok(id),
-        Err(_) => Err(HttpResponse::BadRequest()
-            .json(format!("Invalid {}. Must be a valid integer.", param_name))),
+        Err(_) => Err(format!(
+            "Invalid {}. Must be a valid positive integer.",
+            param_name
+        )),
     }
 }
 
 fn restaurant_error_to_response(err: RestaurantError) -> HttpResponse {
     match err {
-        RestaurantError::LockError(_) => HttpResponse::InternalServerError().json("Internal error"),
+        RestaurantError::LockError(_) => HttpResponse::InternalServerError().finish(),
         RestaurantError::TableNotFound(table_id) => {
-            HttpResponse::NotFound().json(format!("Table not found for table id:{}", table_id,))
+            error_response(404, &format!("Table not found for table id:{}", table_id))
         }
-        RestaurantError::MenuNotFound(menu_id) => {
-            HttpResponse::NotFound().json(format!("Menu item not found for menu id: {}", menu_id))
-        }
-        RestaurantError::MenusRetrieveError => {
-            HttpResponse::InternalServerError().json("Error retrieving menus")
-        }
-        RestaurantError::TablesRetrieveError => {
-            HttpResponse::InternalServerError().json("Error retrieving tables")
-        }
-        RestaurantError::NoMenuForTable(table_id, menu_item_id) => {
-            HttpResponse::NotFound().json(format!(
+        RestaurantError::MenuNotFound(menu_id) => error_response(
+            404,
+            &format!("Menu item not found for menu id: {}", menu_id),
+        ),
+        RestaurantError::MenusRetrieveError => error_response(500, "Error retrieving menus"),
+        RestaurantError::TablesRetrieveError => error_response(500, "Error retrieving tables"),
+        RestaurantError::NoMenuForTable(table_id, menu_item_id) => error_response(
+            404,
+            &format!(
                 "No Menu item with menu item id:{}, is found for Table with table id:{}",
                 menu_item_id, table_id
-            ))
-        }
-        RestaurantError::NoMenusForTable(table_id) => HttpResponse::NotFound().json(format!(
-            "No Menu items added for table with table id:{}",
-            table_id
-        )),
+            ),
+        ),
+        RestaurantError::NoMenusForTable(table_id) => error_response(
+            404,
+            &format!("No Menu items added for table with table id:{}", table_id),
+        ),
     }
 }
 
@@ -288,6 +301,7 @@ mod tests {
     use crate::server::restaurant::SimpleRestaurant;
     use actix_web::{http::StatusCode, test, web, App};
     use mockall::predicate::*;
+    use serde_json::Value;
 
     #[actix_rt::test]
     async fn test_add_item_success() {
@@ -543,7 +557,9 @@ mod tests {
 
         assert_eq!(resp.status(), StatusCode::OK);
 
-        let items: Vec<MenuItem> = test::read_body_json(resp).await;
+        let json_response: Value = test::read_body_json(resp).await;
+        let items: Vec<MenuItem> = serde_json::from_value(json_response["data"].clone()).unwrap();
+
         assert_eq!(items.len(), 1);
         assert_eq!(items[0].id, 1);
         assert_eq!(items[0].name, "Burger");
@@ -642,7 +658,9 @@ mod tests {
 
         assert_eq!(resp.status(), StatusCode::OK);
 
-        let item: MenuItem = test::read_body_json(resp).await;
+        let json_response: Value = test::read_body_json(resp).await;
+        let item: MenuItem = serde_json::from_value(json_response["data"].clone()).unwrap();
+
         assert_eq!(item.id, 1);
         assert_eq!(item.name, "Burger");
     }

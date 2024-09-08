@@ -4,6 +4,7 @@ use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 use reqwest::Client;
 use restaurant_menu_app::server;
+use serde_json::Value;
 use std::collections::HashMap;
 use std::net::TcpListener;
 use std::sync::Arc;
@@ -253,14 +254,18 @@ async fn run_simulation(client: &reqwest::Client, base_url: &str) {
         .send()
         .await
         .unwrap();
-    let table_ids: Vec<u32> = serde_json::from_str(&tables_response.text().await.unwrap()).unwrap();
+    let json_response: Value =
+        serde_json::from_str(&tables_response.text().await.unwrap()).unwrap();
+    let table_ids: Vec<u32> = serde_json::from_value(json_response["data"].clone()).unwrap();
 
     let menus_response = client
         .get(&format!("{}/api/v1/menus", base_url))
         .send()
         .await
         .unwrap();
-    let menus: Vec<MenuItem> = serde_json::from_str(&menus_response.text().await.unwrap()).unwrap();
+
+    let json_response: Value = serde_json::from_str(&menus_response.text().await.unwrap()).unwrap();
+    let menus: Vec<MenuItem> = serde_json::from_value(json_response["data"].clone()).unwrap();
     let menu_ids: Vec<u32> = menus.iter().map(|menu| menu.id).collect();
 
     let mut rng = StdRng::from_entropy();
@@ -409,8 +414,10 @@ async fn run_simulation(client: &reqwest::Client, base_url: &str) {
         let handle = tokio::spawn(async move {
             let url_get_items = format!("{}/api/v1/get_items/{}", base_url_clone, table_id);
             let response = client_clone.get(&url_get_items).send().await.unwrap();
-            let menu_items: Vec<MenuItem> =
+            let json_response: Value =
                 serde_json::from_str(&response.text().await.unwrap()).unwrap();
+            let menu_items: Vec<MenuItem> =
+                serde_json::from_value(json_response["data"].clone()).unwrap();
 
             for item in menu_items {
                 println!(
