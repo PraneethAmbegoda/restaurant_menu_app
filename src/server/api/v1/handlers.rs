@@ -7,10 +7,11 @@ use crate::server::api::v1::openapi::{
     SuccessResponseTables,
 };
 use crate::server::data_model::models::Restaurant;
-use crate::server::utils::error::RestaurantError;
+use crate::server::utils::param_validation::parse_path_param;
+use crate::server::utils::response::restaurant_error_to_response;
 use crate::server::utils::response::{error_response, success_message_response, success_response};
 
-use actix_web::{web, HttpResponse, Responder};
+use actix_web::{web, Responder};
 use std::sync::Arc;
 
 #[derive(Clone)]
@@ -252,42 +253,6 @@ pub async fn get_menus(data: web::Data<AppState>) -> impl Responder {
     match restaurant.get_all_menus() {
         Ok(menus) => success_response(menus),
         Err(e) => restaurant_error_to_response(e),
-    }
-}
-
-fn parse_path_param(param: &str, param_name: &str) -> Result<u32, String> {
-    match param.parse::<u32>() {
-        Ok(id) => Ok(id),
-        Err(_) => Err(format!(
-            "Invalid {}. Must be a valid positive integer.",
-            param_name
-        )),
-    }
-}
-
-fn restaurant_error_to_response(err: RestaurantError) -> HttpResponse {
-    match err {
-        RestaurantError::LockError(_) => HttpResponse::InternalServerError().finish(),
-        RestaurantError::TableNotFound(table_id) => {
-            error_response(404, &format!("Table not found for table id:{}", table_id))
-        }
-        RestaurantError::MenuNotFound(menu_id) => error_response(
-            404,
-            &format!("Menu item not found for menu id: {}", menu_id),
-        ),
-        RestaurantError::MenusRetrieveError => error_response(500, "Error retrieving menus"),
-        RestaurantError::TablesRetrieveError => error_response(500, "Error retrieving tables"),
-        RestaurantError::NoMenuForTable(table_id, menu_item_id) => error_response(
-            404,
-            &format!(
-                "No Menu item with menu item id:{}, is found for Table with table id:{}",
-                menu_item_id, table_id
-            ),
-        ),
-        RestaurantError::NoMenusForTable(table_id) => error_response(
-            404,
-            &format!("No Menu items added for table with table id:{}", table_id),
-        ),
     }
 }
 
